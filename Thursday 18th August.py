@@ -7,6 +7,7 @@ orders = {"Ids": 0}
 def edit_categories():
     empties = []
     print("Empty categories: ")
+    #check every product for categoryID and collect absent categories
     for categoryId in list(categories.keys())[1:]:
         found = False
         for productId in list(products.keys())[1:]:
@@ -15,13 +16,13 @@ def edit_categories():
         if not found:
             empties.append(int(categoryId))
             print("Category ID: {}".format(categoryId))
-
+    #iterate while there are empty categories
     while len(empties) != 0:
         cat_id_input = int(input("Please enter ID of category you want to change (-1 for EXIT): "))
 
         if cat_id_input == -1:
             break
-
+        #validate input
         while not(cat_id_input in empties):
             cat_id_input = int(input("Please enter ID of category you want to change (-1 for EXIT): "))
             if cat_id_input == -1:
@@ -35,9 +36,11 @@ def edit_categories():
                                      "\n2. Delete category."))
 
         if action_input == 2:
+            #remove category
             del categories[cat_id_input]
             empties.remove(cat_id_input)
         else:
+            #add product to category
             prod_name = input("Enter product name:")
             price = float(input("Enter price of the product:"))
             product = [prod_name, price, cat_id_input]
@@ -91,6 +94,7 @@ def adminMenu():
             productId = eval(input("Please enter the product ID: "))
             profit = 0
             quantity = 0
+            #check every order for required productID and add quantity and profit
             for orderID in list(orders.keys())[1:]:
                 if orders[orderID][0] == productId:
                     quantity += orders[orderID][1]
@@ -102,13 +106,14 @@ def adminMenu():
 
         elif option == 2:
             categoryName = input("Please enter the category name: ")
-
+            #find categoryID from categoryName
             for currentCategory in list(categories.keys())[1:]:
                 if categories[currentCategory][0] == categoryName:
                     categoryID = currentCategory
 
             profit = 0
             quantity = 0
+            #check productID of every order, then from that, its category
             for orderID in list(orders.keys())[1:]:
                 productID = orders[orderID][0]
                 currentCategory = products[productID][2]
@@ -125,9 +130,9 @@ def adminMenu():
             visited = []
             profits = {}
 
+            #for every product, check its occurrences in orders and add profits if present
             for productID in list(products.keys())[1:]:
                 if productID not in visited:
-
                     for order in list(orders.keys())[1:]:
                         if orders[order][0] == productID:
                             if productID not in profits:
@@ -136,6 +141,7 @@ def adminMenu():
                                 profits[productID] += orders[order][2]
                     visited.append(productID)
 
+            #sort profits
             pairs = []
             for item in list(profits.keys()):
                 pairs.append((item, profits[item]))
@@ -154,6 +160,7 @@ def adminMenu():
             location = input("Please enter the location: ")
             profit = 0
             quantity = 0
+            #check every order for customerID, then from that, its location
             for orderID in list(orders.keys())[1:]:
                 customerID = orders[orderID][3]
                 currentLocation = customers[customerID][3]
@@ -175,6 +182,7 @@ def adminMenu():
 
             print()
             print("Orders which are {}:".format(status))
+            #check every order for status and productID. From productID, get productName and print
             for orderID in list(orders.keys())[1:]:
                 if orders[orderID][4] == status:
                     print("Order ID: {}".format(orderID))
@@ -189,44 +197,55 @@ def adminMenu():
             print("Invalid option")
             print()
 
-
+#main options menu
 while True:
     option = int(input("Enter the option: \n1. Insert category."
                        "\n2. Insert product. \n3. Insert customer details."
                        "\n4. Insert order. \n5. ADMIN OPTIONS. \n6. Exit.\n"))
     if option == 1:
-        cat_name = input("Enter category name:")
-        cat_desc = input("Enter category description:")
+        cat_name = input("Enter category name: ")
+        cat_desc = input("Enter category description: ")
+        print()
         category = [cat_name, cat_desc]
         insertCategory(category)
+
     elif option == 2:
-        prod_name = input("Enter product name:")
-        price = float(input("Enter price of the product:"))
-        cat_id = int(input("Enter category Id:"))
+        prod_name = input("Enter product name: ")
+        price = float(input("Enter price of the product: "))
+        cat_id = int(input("Enter category Id: "))
+        print()
         product = [prod_name, price, cat_id]
         insertProduct(product)
+
     elif option == 3:
-        cust_email = input("Enter an email:")
-        cust_phone_number = input("Enter phone number:")
-        address = input("Enter the address:")
-        location = input("Enter location:")
-        country = input("Enter the country:")
+        cust_email = input("Enter an email: ")
+        cust_phone_number = input("Enter phone number: ")
+        address = input("Enter the address: ")
+        location = input("Enter location: ")
+        country = input("Enter the country: ")
+        print()
         customer = [cust_email, cust_phone_number, address,
                     location, country]
         insertCustomerDetails(customer)
+
     elif option == 4:
-        p_id = int(input("Enter product Id:"))
-        quantity = int(input("Enter quantity of product:"))
+        p_id = int(input("Enter product Id: "))
+        quantity = int(input("Enter quantity of product: "))
         total_price = quantity * products[p_id][1]
-        customer_id = int(input("Enter customer Id:"))
-        status = input("Enter status (Delivered / Shipping):")
+        customer_id = int(input("Enter customer Id: "))
+        status = input("Enter status (Delivered / Shipping): ")
         while status != "Delivered" and status != "Shipping":
-            status = input("Enter status (Delivered / Shipping):")
+            status = input("Enter status (Delivered / Shipping): ")
         order = [p_id, quantity, total_price, customer_id, status]
+        print()
         insertOrder(order)
+
     elif option == 5:
         adminMenu()
+
     elif option == 6:
         break
+    
     else:
         print("invalid")
+        print()
